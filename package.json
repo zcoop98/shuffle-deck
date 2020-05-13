@@ -26,13 +26,59 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
+      "plugin:vue/recommended",
       "eslint:recommended"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "vue/max-attributes-per-line": [
+        "warn",
+        {
+          "singleline": 3
+        }
+      ],
+      "vue/html-indent": [
+        "error",
+        4
+      ],
+      "vue/script-indent": [
+        "error",
+        4
+      ],
+      "vue/arrow-spacing": "error",
+      "vue/block-spacing": "error",
+      "vue/component-definition-name-casing": "error",
+      "vue/component-tags-order": [
+        "error",
+        {
+          "order": [
+            "template",
+            "script",
+            "style"
+          ]
+        }
+      ],
+      "vue/component-name-in-template-casing": [
+        "warn",
+        "kebab-case"
+      ],
+      "vue/key-spacing": "error",
+      "vue/match-component-file-name": "warn",
+      "vue/no-empty-pattern": "error",
+      "vue/no-irregular-whitespace": "error",
+      "vue/no-reserved-component-names": "error",
+      "vue/require-direct-export": "error",
+      "vue/space-infix-ops": "warn",
+      "vue/static-class-names-order": "error",
+      "vue/v-on-function-call": "warn",
+      "vue/valid-v-bind-sync": "error",
+      "vue/valid-v-slot": "error",
+      "vue/no-unused-components": "warn",
+      "vue/no-unused-vars": "warn",
+      "no-unused-vars": "warn"
+    }
   },
   "browserslist": [
     "> 1%",
