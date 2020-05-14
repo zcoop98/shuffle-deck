@@ -48,7 +48,7 @@
         4
       ],
       "vue/script-indent": [
-        "error",
+        "warn",
         4
       ],
       "vue/arrow-spacing": "error",
