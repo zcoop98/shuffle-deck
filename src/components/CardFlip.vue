@@ -31,10 +31,44 @@
             </b-row>
         </b-card>
         <b-card>
-            <b-btn @click="generateHand(0)">
-                Generate Royal Flush
-            </b-btn>
-            <p>Shuffles: {{ genShuffles }}</p>
+            <b-row>
+                <p>Generate: </p>
+                <b-col>
+                    <b-btn class="mx-1" variant="info" @click="generateHand(0)">
+                        Royal Flush
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Straight Flush
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Four of a Kind
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Full House
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Flush
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Straight
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Three of a Kind
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Two Pair
+                    </b-btn>
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                        Pair
+                    </b-btn>
+                </b-col>
+            </b-row>
+
+            <b-row>
+                <b-col>
+                    <p>Shuffles: {{ genShuffles }}</p>
+                </b-col>
+            </b-row>
         </b-card>
     </div>
 </template>
