@@ -29,13 +29,12 @@
                     />
                 </b-col>
             </b-row>
-            <!-- <b-row>
-                <b-col v-for="(card, index) in cards" :key="card.face + index">
-                    <b-btn class="mt-3" @click="flip(index)">
-                        Reveal
-                    </b-btn>
-                </b-col>
-            </b-row> -->
+        </b-card>
+        <b-card>
+            <b-btn @click="generateHand(0)">
+                Generate Royal Flush
+            </b-btn>
+            <p>Shuffles: {{ genShuffles }}</p>
         </b-card>
     </div>
 </template>
@@ -73,6 +72,7 @@ export default {
                     hide: true,
                 }
             ],
+            genShuffles: 0,
         };
     },
     computed: {
@@ -128,6 +128,45 @@ export default {
             this.turn();
             this.cards[4].hide = false;
         },
+        generateHand(handId) {
+            const hands = [this.checkRoyalFlush];
+
+            for (var i = 0; i < 5; i++) {
+                this.cards[i].hide = true;
+            }
+
+            this.genShuffles = 0;
+            do {
+                this.genShuffles++;
+                this.shuffleDeck();
+            } while(!hands[handId]())
+
+            for (var j = 0; j < 5; j++) {
+                this.cards[j].face = this.deck[j];
+                this.cards[j].hide = false;
+            }
+        },
+        checkRoyalFlush() {
+            //suit check
+            if (!this.checkFlush())
+                return false;
+
+            //order check (flush found, checking royal)
+            for (var i = 0; i < 5; i++) {
+                console.log('!isNaN(+this.deck[i][0])', !isNaN(+this.deck[i][0]));
+                if (!isNaN(+this.deck[i][0])) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        checkFlush() {
+            for (var i = 1; i < 5; i++) {
+                if (!(this.deck[i][1] === this.deck[0][1])) {
+                    return false;
+                }
+            }
+            return true;
         }
     },
 }
