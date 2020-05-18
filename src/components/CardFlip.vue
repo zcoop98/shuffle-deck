@@ -40,10 +40,10 @@
                     <b-btn class="mx-1" variant="info" @click="generateHand(1)">
                         Straight Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(2)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(2)">
                         Four of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(3)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(3)">
                         Full House
                     </b-btn>
                     <b-btn class="mx-1" variant="info" @click="generateHand(4)">
@@ -52,13 +52,13 @@
                     <b-btn class="mx-1" variant="info" @click="generateHand(5)">
                         Straight
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(6)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(6)">
                         Three of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(7)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(7)">
                         Two Pair
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(8)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(8)">
                         Pair
                     </b-btn>
                 </b-col>
@@ -67,6 +67,7 @@
             <b-row>
                 <b-col>
                     <p>Shuffles: {{ genShuffles }}</p>
+                    <p>Time: {{ Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 }} seconds</p>
                 </b-col>
             </b-row>
         </b-card>
@@ -107,6 +108,7 @@ export default {
                 }
             ],
             genShuffles: 0,
+            msTimeElapsed: 0,
         };
     },
     computed: {
@@ -129,7 +131,6 @@ export default {
 
         for (let i = 0; i < 4; i++)
             for (let j = 0; j < 13; j++) {
-
                 this.deck.push(order[j] + suit[i]);
             }
 
@@ -145,6 +146,15 @@ export default {
         },
         shuffleDeck() {
             knuthShuffle(this.deck);
+        },
+        orderSet() {
+            return new Set([
+                this.orderToNumber(this.deck[0][0]),
+                this.orderToNumber(this.deck[1][0]),
+                this.orderToNumber(this.deck[2][0]),
+                this.orderToNumber(this.deck[3][0]),
+                this.orderToNumber(this.deck[4][0])
+            ]);
         },
         flip(cardNum) {
             this.cards[cardNum].hide = !this.cards[cardNum].hide;
@@ -183,24 +193,36 @@ export default {
             const hands = [
                 this.checkRoyalFlush,
                 this.checkStraightFlush,
-                null,
-                null,
+                this.checkFourKind,
+                this.checkFullHouse,
                 this.checkFlush,
                 this.checkStraight,
-                null,
-                null,
-                null
+                this.checkThreeKind,
+                this.checkTwoPair,
+                this.checkPair
             ];
+
+            if (handId >= hands.length || handId < 0) {
+                this.genShuffles = 'TILT';
+                return null;
+            }
 
             for (var i = 0; i < 5; i++) {
                 this.cards[i].hide = true;
             }
 
             this.genShuffles = 0;
+            var t0 = performance.now();
             do {
                 this.genShuffles++;
                 this.shuffleDeck();
-            } while(!hands[handId]())
+            } while(!hands[handId]() && this.genShuffles < 3000000)
+            var t1 = performance.now();
+
+            this.msTimeElapsed = t1 - t0;
+
+            if (this.genShuffles === 3000000)
+                this.genShuffles = 'TILT';
 
             for (var j = 0; j < 5; j++) {
                 this.cards[j].face = this.deck[j];
@@ -214,6 +236,7 @@ export default {
 
             //order check (flush found, checking royal)
             for (var i = 0; i < 5; i++) {
+                //Can use a special method since a royal's orders are all non-numbers
                 if (!isNaN(+this.deck[i][0])) {
                     return false;
                 }
@@ -222,6 +245,28 @@ export default {
         },
         checkStraightFlush() {
             return this.checkFlush() && this.checkStraight();
+        },
+        checkTwoSet(isFullHouseMode) {
+            var hand = this.orderSet();
+
+            if (hand.size === 2) {
+                var matchCount = 0;
+
+                for (var i = 1; i < 5; i++) {
+                    if ((this.deck[i][0] === this.deck[0][0])) {
+                        matchCount++;
+                    }
+                }
+                return (isFullHouseMode ? (matchCount === 1 || matchCount === 2) : (matchCount === 0 || matchCount === 3));
+            }
+            else
+                return false;
+        },
+        checkFourKind() {
+            return this.checkTwoSet(false);
+        },
+        checkFullHouse() {
+            return this.checkTwoSet(true);
         },
         checkFlush() {
             for (var i = 1; i < 5; i++) {
@@ -232,15 +277,36 @@ export default {
             return true;
         },
         checkStraight() {
-            var hand = new Set([
-                this.orderToNumber(this.deck[0][0]),
-                this.orderToNumber(this.deck[1][0]),
-                this.orderToNumber(this.deck[2][0]),
-                this.orderToNumber(this.deck[3][0]),
-                this.orderToNumber(this.deck[4][0])
-            ]);
+            var hand = this.orderSet();
 
             return hand.size === 5 && (Math.max(...hand) - Math.min(...hand) === 4);
+        },
+        checkThreeKind() {
+            var hand = this.orderSet();
+
+            if (hand.size <= 3) {
+                var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
+                return handArr.filter((v, i, arr) => i !== arr.indexOf(v))
+                    .filter((v, i, arr) => i !== arr.indexOf(v))
+                    .length > 0;
+            }
+            else
+                return false;
+        },
+        checkTwoPair() {
+            var hand = this.orderSet();
+
+            if (hand.size <= 3) {
+                var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
+                var dupeArr = handArr.filter((v, i, arr) => i !== arr.indexOf(v));
+
+                return new Set(dupeArr).size == 2;
+            }
+            else
+                return false;
+        },
+        checkPair() {
+            return this.orderSet().size <= 4;
         },
     },
 }
