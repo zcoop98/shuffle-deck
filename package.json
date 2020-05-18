@@ -49,7 +49,10 @@
       ],
       "vue/script-indent": [
         "warn",
-        4
+        4,
+        {
+          "switchCase": 1
+        }
       ],
       "vue/arrow-spacing": "error",
       "vue/block-spacing": "error",

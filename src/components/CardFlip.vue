@@ -37,28 +37,28 @@
                     <b-btn class="mx-1" variant="info" @click="generateHand(0)">
                         Royal Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(1)">
                         Straight Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(2)">
                         Four of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(3)">
                         Full House
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(4)">
                         Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" @click="generateHand(5)">
                         Straight
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(6)">
                         Three of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(7)">
                         Two Pair
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(0)">
+                    <b-btn class="mx-1" variant="info" disabled @click="generateHand(8)">
                         Pair
                     </b-btn>
                 </b-col>
@@ -162,8 +162,35 @@ export default {
             this.turn();
             this.cards[4].hide = false;
         },
+        orderToNumber(order) {
+            if (isNaN(order))
+                switch (order) {
+                    case 'A':
+                        return 1;
+                    case 'T':
+                        return 10;
+                    case 'J':
+                        return 11;
+                    case 'Q':
+                        return 12;
+                    case 'K':
+                        return 13;
+                }
+            else
+                return order;
+        },
         generateHand(handId) {
-            const hands = [this.checkRoyalFlush];
+            const hands = [
+                this.checkRoyalFlush,
+                this.checkStraightFlush,
+                null,
+                null,
+                this.checkFlush,
+                this.checkStraight,
+                null,
+                null,
+                null
+            ];
 
             for (var i = 0; i < 5; i++) {
                 this.cards[i].hide = true;
@@ -187,12 +214,14 @@ export default {
 
             //order check (flush found, checking royal)
             for (var i = 0; i < 5; i++) {
-                console.log('!isNaN(+this.deck[i][0])', !isNaN(+this.deck[i][0]));
                 if (!isNaN(+this.deck[i][0])) {
                     return false;
                 }
             }
             return true;
+        },
+        checkStraightFlush() {
+            return this.checkFlush() && this.checkStraight();
         },
         checkFlush() {
             for (var i = 1; i < 5; i++) {
@@ -201,7 +230,18 @@ export default {
                 }
             }
             return true;
-        }
+        },
+        checkStraight() {
+            var hand = new Set([
+                this.orderToNumber(this.deck[0][0]),
+                this.orderToNumber(this.deck[1][0]),
+                this.orderToNumber(this.deck[2][0]),
+                this.orderToNumber(this.deck[3][0]),
+                this.orderToNumber(this.deck[4][0])
+            ]);
+
+            return hand.size === 5 && (Math.max(...hand) - Math.min(...hand) === 4);
+        },
     },
 }
 </script>
