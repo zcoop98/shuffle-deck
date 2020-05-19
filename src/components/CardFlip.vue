@@ -126,12 +126,12 @@ export default {
         },
     },
     created() { //initialize deck
-        const order = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'T', 'J', 'Q', 'K'];
+        const rank = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'T', 'J', 'Q', 'K'];
         const suit = ['S', 'D', 'C', 'H'];
 
         for (let i = 0; i < 4; i++)
             for (let j = 0; j < 13; j++) {
-                this.deck.push(order[j] + suit[i]);
+                this.deck.push(rank[j] + suit[i]);
             }
 
         this.reDeal();
@@ -147,13 +147,13 @@ export default {
         shuffleDeck() {
             knuthShuffle(this.deck);
         },
-        orderSet() {
+        rankSet() {
             return new Set([
-                this.orderToNumber(this.deck[0][0]),
-                this.orderToNumber(this.deck[1][0]),
-                this.orderToNumber(this.deck[2][0]),
-                this.orderToNumber(this.deck[3][0]),
-                this.orderToNumber(this.deck[4][0])
+                this.rankToNumber(this.deck[0][0]),
+                this.rankToNumber(this.deck[1][0]),
+                this.rankToNumber(this.deck[2][0]),
+                this.rankToNumber(this.deck[3][0]),
+                this.rankToNumber(this.deck[4][0])
             ]);
         },
         flip(cardNum) {
@@ -172,9 +172,9 @@ export default {
             this.turn();
             this.cards[4].hide = false;
         },
-        orderToNumber(order) {
-            if (isNaN(order))
-                switch (order) {
+        rankToNumber(rank) {
+            if (isNaN(rank))
+                switch (rank) {
                     case 'A':
                         return 1;
                     case 'T':
@@ -187,7 +187,7 @@ export default {
                         return 13;
                 }
             else
-                return order;
+                return rank;
         },
         generateHand(handId) {
             const hands = [
@@ -234,9 +234,9 @@ export default {
             if (!this.checkFlush())
                 return false;
 
-            //order check (flush found, checking royal)
+            //rank check (flush found, checking royal)
             for (var i = 0; i < 5; i++) {
-                //Can use a special method since a royal's orders are all non-numbers
+                //Can use a special method since a royal's ranks are all non-numbers
                 if (!isNaN(+this.deck[i][0])) {
                     return false;
                 }
@@ -247,7 +247,7 @@ export default {
             return this.checkFlush() && this.checkStraight();
         },
         checkTwoSet(isFullHouseMode) {
-            var hand = this.orderSet();
+            var hand = this.rankSet();
 
             if (hand.size === 2) {
                 var matchCount = 0;
@@ -277,12 +277,12 @@ export default {
             return true;
         },
         checkStraight() {
-            var hand = this.orderSet();
+            var hand = this.rankSet();
 
             return hand.size === 5 && (Math.max(...hand) - Math.min(...hand) === 4);
         },
         checkThreeKind() {
-            var hand = this.orderSet();
+            var hand = this.rankSet();
 
             if (hand.size <= 3) {
                 var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
@@ -294,7 +294,7 @@ export default {
                 return false;
         },
         checkTwoPair() {
-            var hand = this.orderSet();
+            var hand = this.rankSet();
 
             if (hand.size <= 3) {
                 var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
@@ -306,7 +306,7 @@ export default {
                 return false;
         },
         checkPair() {
-            return this.orderSet().size <= 4;
+            return this.rankSet().size <= 4;
         },
     },
 }
