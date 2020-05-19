@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <b-card
-            title="5 Card Poker"
-        >
-            <b-row>
-                <b-btn class="mb-4" :variant="reDealHighlight" @click="reDeal">
-                    Re-Deal
+    <b-card title="5 Card Poker">
+        <b-row>
+            <b-btn :variant="reDealHighlight" @click="reDeal">
+                Re-Deal
+            </b-btn>
+
+            <b-btn-group class="ml-2">
+                <b-btn variant="success" :disabled="flopDone" @click="flop">
+                    Flop
                 </b-btn>
-                <b-btn-group class="mb-4 ml-2">
-                    <b-btn variant="success" :disabled="flopDone" @click="flop">
-                        Flop
-                    </b-btn>
-                    <b-btn variant="warning" :disabled="turnDone" @click="turn">
-                        Turn
-                    </b-btn>
-                    <b-btn variant="danger" :disabled="riverDone" @click="river">
-                        River
-                    </b-btn>
-                </b-btn-group>
-            </b-row>
-            <b-row>
+
+                <b-btn variant="warning" :disabled="turnDone" @click="turn">
+                    Turn
+                </b-btn>
+
+                <b-btn variant="danger" :disabled="riverDone" @click="river">
+                    River
+                </b-btn>
+            </b-btn-group>
+        </b-row>
+
+        <b-overlay :show="isLoading" :rounded="true">
+            <b-row class="my-4">
                 <b-col v-for="(card, index) in cards" :key="card.face + index">
                     <vue-playing-card
                         :key="card.face"
@@ -29,49 +31,62 @@
                     />
                 </b-col>
             </b-row>
-        </b-card>
-        <b-card>
-            <b-row>
-                <p>Generate: </p>
-                <b-col>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(0)">
+        </b-overlay>
+
+        <b-row>
+            <b-col>
+                <b-btn-group>
+                    <b-btn variant="dark" disabled>
+                        Generators:
+                    </b-btn>
+
+                    <b-btn variant="info" @click="generateHand(0)">
                         Royal Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(1)">
+
+                    <b-btn variant="info" @click="generateHand(1)">
                         Straight Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(2)">
+
+                    <b-btn variant="info" @click="generateHand(2)">
                         Four of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(3)">
+
+                    <b-btn variant="info" @click="generateHand(3)">
                         Full House
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(4)">
+
+                    <b-btn variant="info" @click="generateHand(4)">
                         Flush
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(5)">
+
+                    <b-btn variant="info" @click="generateHand(5)">
                         Straight
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(6)">
+
+                    <b-btn variant="info" @click="generateHand(6)">
                         Three of a Kind
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(7)">
+
+                    <b-btn variant="info" @click="generateHand(7)">
                         Two Pair
                     </b-btn>
-                    <b-btn class="mx-1" variant="info" @click="generateHand(8)">
+
+                    <b-btn variant="info" @click="generateHand(8)">
                         Pair
                     </b-btn>
-                </b-col>
-            </b-row>
+                </b-btn-group>
+            </b-col>
+        </b-row>
 
-            <b-row>
-                <b-col>
-                    <p>Shuffles: {{ genShuffles }}</p>
-                    <p>Time: {{ Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 }} seconds</p>
-                </b-col>
-            </b-row>
-        </b-card>
-    </div>
+        <b-row>
+            <b-col>
+                <p>Shuffles: {{ genShuffles }}</p>
+
+                <p>Time: {{ Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 }} seconds</p>
+            </b-col>
+        </b-row>
+    </b-card>
 </template>
 
 <script>
@@ -109,20 +124,21 @@ export default {
             ],
             genShuffles: 0,
             msTimeElapsed: 0,
+            isLoading: false,
         };
     },
     computed: {
         reDealHighlight() {
-            return this.cards[4].hide ? 'secondary' : 'info';
+            return this.cards[4].hide ? 'outline-info' : 'info';
         },
         flopDone() {
-            return !this.cards[0].hide;
+            return !this.cards[0].hide || this.isLoading;
         },
         turnDone() {
-            return !this.cards[3].hide;
+            return !this.cards[3].hide || this.isLoading;
         },
         riverDone() {
-            return !this.cards[4].hide;
+            return !this.cards[4].hide || this.isLoading;
         },
     },
     created() { //initialize deck
@@ -207,27 +223,31 @@ export default {
                 return null;
             }
 
-            for (var i = 0; i < 5; i++) {
-                this.cards[i].hide = true;
-            }
+            this.isLoading = true;
 
             this.genShuffles = 0;
-            var t0 = performance.now();
-            do {
-                this.genShuffles++;
-                this.shuffleDeck();
-            } while(!hands[handId]() && this.genShuffles < 3000000)
-            var t1 = performance.now();
+            this.msTimeElapsed = 0;
 
-            this.msTimeElapsed = t1 - t0;
+            setTimeout(() => {   //Delay allows event loop to clear
+                this.genShuffles = 0;
+                var t0 = performance.now();
+                do {
+                    this.genShuffles++;
+                    this.shuffleDeck();
+                } while(!hands[handId]() && this.genShuffles < 3000000)
+                var t1 = performance.now();
+                this.msTimeElapsed = t1 - t0;
 
-            if (this.genShuffles === 3000000)
-                this.genShuffles = 'TILT';
+                if (this.genShuffles === 3000000)
+                    this.genShuffles = 'TILT';
 
-            for (var j = 0; j < 5; j++) {
-                this.cards[j].face = this.deck[j];
-                this.cards[j].hide = false;
-            }
+                this.isLoading = false;
+
+                for (var j = 0; j < 5; j++) {
+                    this.cards[j].face = this.deck[j];
+                    this.cards[j].hide = false;
+                }
+            }, 100);
         },
         checkRoyalFlush() {
             //suit check
