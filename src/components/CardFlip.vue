@@ -1,5 +1,5 @@
 <template>
-    <b-card title="5 Card Poker">
+    <b-card class="px-2" title="5 Card Poker">
         <b-row>
             <b-btn :variant="reDealHighlight" @click="reDeal">
                 Re-Deal
@@ -79,11 +79,13 @@
             </b-col>
         </b-row>
 
-        <b-row>
-            <b-col>
-                <p>Shuffles: {{ genShuffles }}</p>
-
-                <p>Time: {{ Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 }} seconds</p>
+        <b-row class="mt-4" align-h="center">
+            <b-col cols="4">
+                <b-card>
+                    <p>Shuffles: {{ genShuffles }}</p>
+    
+                    <p>Time: {{ !isNaN(+msTimeElapsed) ? Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 + ' seconds' : msTimeElapsed }}</p>
+                </b-card>
             </b-col>
         </b-row>
     </b-card>
@@ -122,8 +124,8 @@ export default {
                     hide: true,
                 }
             ],
-            genShuffles: 0,
-            msTimeElapsed: 0,
+            genShuffles: '-',
+            msTimeElapsed: '-',
             isLoading: false,
         };
     },
@@ -225,17 +227,20 @@ export default {
 
             this.isLoading = true;
 
-            this.genShuffles = 0;
-            this.msTimeElapsed = 0;
+            this.genShuffles = '-';
+            this.msTimeElapsed = '-';
 
             setTimeout(() => {   //Delay allows event loop to clear
                 this.genShuffles = 0;
+                this.msTimeElapsed = 0;
+
                 var t0 = performance.now();
                 do {
                     this.genShuffles++;
                     this.shuffleDeck();
                 } while(!hands[handId]() && this.genShuffles < 3000000)
                 var t1 = performance.now();
+
                 this.msTimeElapsed = t1 - t0;
 
                 if (this.genShuffles === 3000000)
