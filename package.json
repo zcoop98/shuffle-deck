@@ -13,7 +13,7 @@
     "core-js": "^3.6.4",
     "knuth-shuffle": "^1.0.8",
     "vue": "^2.6.11",
-    "vue-playing-card": "0.0.5"
+    "vue-playing-card": "^1.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
