@@ -4,28 +4,12 @@
             5 Card Poker
         </h4>
         <b-card no-body>
-            <b-tabs card>
+            <b-tabs
+                card
+                fill
+                @activate-tab="reDeal"
+            >
                 <b-tab title="Generators" active>
-                    <b-row>
-                        <b-btn :variant="reDealHighlight" @click="reDeal">
-                            Re-Deal
-                        </b-btn>
-
-                        <b-btn-group class="ml-2">
-                            <b-btn variant="success" :disabled="flopDone" @click="flop">
-                                Flop
-                            </b-btn>
-
-                            <b-btn variant="warning" :disabled="turnDone" @click="turn">
-                                Turn
-                            </b-btn>
-
-                            <b-btn variant="danger" :disabled="riverDone" @click="river">
-                                River
-                            </b-btn>
-                        </b-btn-group>
-                    </b-row>
-
                     <b-overlay :show="isLoading" :rounded="true">
                         <template #overlay>
                             <b-icon-shuffle font-scale="3" animation="throb" />
@@ -101,9 +85,56 @@
                     </b-row>
                 </b-tab>
                 <b-tab title="Deal">
-                    <p>
-                        Coming Soon...
-                    </p>
+                    <b-row>
+                        <b-btn :variant="reDealHighlight" @click="reDeal">
+                            Re-Deal
+                        </b-btn>
+
+                        <b-btn-group class="ml-2">
+                            <b-btn variant="success" :disabled="flopDone" @click="flop">
+                                Flop
+                            </b-btn>
+
+                            <b-btn variant="warning" :disabled="turnDone" @click="turn">
+                                Turn
+                            </b-btn>
+
+                            <b-btn variant="danger" :disabled="riverDone" @click="river">
+                                River
+                            </b-btn>
+                        </b-btn-group>
+                    </b-row>
+
+                    <b-overlay :show="isLoading" :rounded="true">
+                        <template #overlay>
+                            <b-icon-shuffle font-scale="3" animation="throb" />
+                        </template>
+                        <b-row class="my-4">
+                            <b-col v-for="(card, index) in cards" :key="card.face + index">
+                                <vue-playing-card
+                                    :key="card.face"
+                                    height="200"
+                                    :signature="card.face"
+                                    :cover="card.hide"
+                                />
+                            </b-col>
+                        </b-row>
+                    </b-overlay>
+
+                    <b-row class="mt-4" align-h="center">
+                        <b-col cols="4">
+                            <b-card>
+                                <vue-playing-card
+                                    v-for="pocket in pockets"
+                                    :key="pocket.face"
+                                    class="px-2"
+                                    height="200"
+                                    :signature="pocket.face"
+                                    :cover="pocket.hide"
+                                />
+                            </b-card>
+                        </b-col>
+                    </b-row>
                 </b-tab>
             </b-tabs>
         </b-card>
@@ -111,7 +142,7 @@
 </template>
 
 <script>
-import { BIcon, BIconShuffle } from 'bootstrap-vue';
+import { BIconShuffle } from 'bootstrap-vue';
 import { VuePlayingCard } from 'vue-playing-card';
 import { knuthShuffle } from 'knuth-shuffle';
 
@@ -143,6 +174,16 @@ export default {
                 {
                     face: null,
                     hide: true,
+                }
+            ],
+            pockets: [
+                {
+                    face: null,
+                    hide: false,
+                },
+                {
+                    face: null,
+                    hide: false,
                 }
             ],
             genShuffles: '-',
@@ -182,6 +223,11 @@ export default {
                 this.cards[i].face = this.deck[i];
                 this.cards[i].hide = true;
             }
+            this.pockets[0].face = this.deck[5];
+            this.pockets[0].hide = false;
+
+            this.pockets[1].face = this.deck[6];
+            this.pockets[1].hide = false;
         },
         shuffleDeck() {
             knuthShuffle(this.deck);
@@ -259,12 +305,12 @@ export default {
                 do {
                     this.genShuffles++;
                     this.shuffleDeck();
-                } while(!hands[handId]() && this.genShuffles < 3000000)
+                } while(!hands[handId]() && this.genShuffles < 6000000)
                 var t1 = performance.now();
 
                 this.msTimeElapsed = t1 - t0;
 
-                if (this.genShuffles === 3000000)
+                if (this.genShuffles === 6000000)
                     this.genShuffles = 'TILT';
 
                 this.isLoading = false;
