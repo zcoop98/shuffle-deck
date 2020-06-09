@@ -10,22 +10,22 @@
                         <b-btn :variant="reDealHighlight" @click="reDeal">
                             Re-Deal
                         </b-btn>
-            
+
                         <b-btn-group class="ml-2">
                             <b-btn variant="success" :disabled="flopDone" @click="flop">
                                 Flop
                             </b-btn>
-            
+
                             <b-btn variant="warning" :disabled="turnDone" @click="turn">
                                 Turn
                             </b-btn>
-            
+
                             <b-btn variant="danger" :disabled="riverDone" @click="river">
                                 River
                             </b-btn>
                         </b-btn-group>
                     </b-row>
-            
+
                     <b-overlay :show="isLoading" :rounded="true">
                         <template #overlay>
                             <b-icon-shuffle font-scale="3" animation="throb" />
@@ -41,59 +41,59 @@
                             </b-col>
                         </b-row>
                     </b-overlay>
-            
+
                     <b-row>
                         <b-col>
                             <b-btn-group>
                                 <b-btn variant="dark" disabled>
                                     Generators:
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(0)">
                                     Royal Flush
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(1)">
                                     Straight Flush
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(2)">
                                     Four of a Kind
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(3)">
                                     Full House
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(4)">
                                     Flush
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(5)">
                                     Straight
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(6)">
                                     Three of a Kind
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(7)">
                                     Two Pair
                                 </b-btn>
-            
+
                                 <b-btn variant="info" @click="generateHand(8)">
                                     Pair
                                 </b-btn>
                             </b-btn-group>
                         </b-col>
                     </b-row>
-            
+
                     <b-row class="mt-4" align-h="center">
                         <b-col cols="4">
                             <b-overlay :show="isLoading" :rounded="true">
                                 <b-card>
                                     <p>Shuffles: {{ genShuffles }}</p>
-                    
+
                                     <p>Time: {{ !isNaN(+msTimeElapsed) ? Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 + ' seconds' : msTimeElapsed }}</p>
                                 </b-card>
                             </b-overlay>
