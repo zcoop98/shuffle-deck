@@ -21,6 +21,9 @@
         </b-row>
 
         <b-overlay :show="isLoading" :rounded="true">
+            <template #overlay>
+                <b-icon-shuffle font-scale="3" animation="throb" />
+            </template>
             <b-row class="my-4">
                 <b-col v-for="(card, index) in cards" :key="card.face + index">
                     <vue-playing-card
@@ -81,23 +84,27 @@
 
         <b-row class="mt-4" align-h="center">
             <b-col cols="4">
-                <b-card>
-                    <p>Shuffles: {{ genShuffles }}</p>
-    
-                    <p>Time: {{ !isNaN(+msTimeElapsed) ? Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 + ' seconds' : msTimeElapsed }}</p>
-                </b-card>
+                <b-overlay :show="isLoading" :rounded="true">
+                    <b-card>
+                        <p>Shuffles: {{ genShuffles }}</p>
+        
+                        <p>Time: {{ !isNaN(+msTimeElapsed) ? Math.round((msTimeElapsed + Number.EPSILON) * 10000) / 10000000 + ' seconds' : msTimeElapsed }}</p>
+                    </b-card>
+                </b-overlay>
             </b-col>
         </b-row>
     </b-card>
 </template>
 
 <script>
+import { BIcon, BIconShuffle } from 'bootstrap-vue';
 import { VuePlayingCard } from 'vue-playing-card';
 import { knuthShuffle } from 'knuth-shuffle';
 
 export default {
     components: {
         VuePlayingCard,
+        BIconShuffle,
     },
     data() {
         return {
