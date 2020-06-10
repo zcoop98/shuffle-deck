@@ -407,6 +407,9 @@ export default {
         },
         getBestHand() {
             var set = [...this.cards, ...this.pockets];
+            for (var i = 0; i < set.length; ++i) {
+                set[i] = set[i].face;
+            }
             var combos = [];
             this.getAllHandCombos(set, combos);
         },
