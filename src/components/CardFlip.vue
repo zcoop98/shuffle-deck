@@ -134,6 +134,11 @@
                                 />
                             </b-card>
                         </b-col>
+                        <b-col cols="2">
+                            <b-btn @click="getBestHand">
+                                Check Best Hand
+                            </b-btn>
+                        </b-col>
                     </b-row>
                 </b-tab>
             </b-tabs>
@@ -399,6 +404,30 @@ export default {
         },
         checkPair() {
             return this.rankSet().size <= 4;
+        },
+        getBestHand() {
+            var set = [...this.cards, ...this.pockets];
+            var combos = [];
+            this.getAllHandCombos(set, combos);
+        },
+        getAllHandCombos(set, outputSet) {
+            var temp = [];
+            this.handComboUtil(set, outputSet, temp, 0, set.length-1, 0, 5);
+        },
+        handComboUtil(set, outputSet, temp, start, end, index, r)
+        {
+            // Adapted from https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+            if (index == r)
+            {
+                outputSet.push(temp);
+                return;
+            }
+
+            for (var i = start; i <= end && end - i + 1 >= r - index; i++)
+            {
+                temp[index] = set[i];
+                this.handComboUtil(set, outputSet, temp, i+1, end, index+1, r);
+            }
         },
     },
 }
