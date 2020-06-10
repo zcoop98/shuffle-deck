@@ -84,7 +84,12 @@
       "vue/valid-v-slot": "error",
       "vue/no-unused-components": "warn",
       "vue/no-unused-vars": "warn",
-      "no-unused-vars": "warn"
+      "no-unused-vars": "warn",
+      "comma-dangle": ["warn", {
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline"
+      }]
     }
   },
   "browserslist": [
