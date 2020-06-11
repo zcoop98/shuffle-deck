@@ -422,7 +422,7 @@ export default {
             // Adapted from https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
             if (index == r)
             {
-                outputSet.push(temp);
+                outputSet.push(temp.slice());
                 return;
             }
 
