@@ -89,7 +89,9 @@
         "objects": "always-multiline",
         "imports": "always-multiline",
         "exports": "always-multiline"
-      }]
+      }],
+      "no-debugger": "warn",
+      "no-console": "warn"
     }
   },
   "browserslist": [
