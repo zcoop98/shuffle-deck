@@ -237,13 +237,13 @@ export default {
         shuffleDeck() {
             knuthShuffle(this.deck);
         },
-        rankSet() {
+        rankSet(hand) {
             return new Set([
-                this.rankToNumber(this.deck[0][0]),
-                this.rankToNumber(this.deck[1][0]),
-                this.rankToNumber(this.deck[2][0]),
-                this.rankToNumber(this.deck[3][0]),
-                this.rankToNumber(this.deck[4][0])
+                this.rankToNumber(hand[0][0]),
+                this.rankToNumber(hand[1][0]),
+                this.rankToNumber(hand[2][0]),
+                this.rankToNumber(hand[3][0]),
+                this.rankToNumber(hand[4][0])
             ]);
         },
         flip(cardNum) {
@@ -310,7 +310,7 @@ export default {
                 do {
                     this.genShuffles++;
                     this.shuffleDeck();
-                } while(!hands[handId]() && this.genShuffles < 6000000)
+                } while(!hands[handId](this.deck) && this.genShuffles < 6000000)
                 var t1 = performance.now();
 
                 this.msTimeElapsed = t1 - t0;
@@ -326,31 +326,31 @@ export default {
                 }
             }, 100);
         },
-        checkRoyalFlush() {
+        checkRoyalFlush(hand) {
             //suit check
-            if (!this.checkFlush())
+            if (!this.checkFlush(hand))
                 return false;
 
             //rank check (flush found, checking royal)
             for (var i = 0; i < 5; i++) {
                 //Can use a special method since a royal's ranks are all non-numbers
-                if (!isNaN(+this.deck[i][0])) {
+                if (!isNaN(+hand[i][0])) {
                     return false;
                 }
             }
             return true;
         },
-        checkStraightFlush() {
-            return this.checkFlush() && this.checkStraight();
+        checkStraightFlush(hand) {
+            return this.checkFlush(hand) && this.checkStraight(hand);
         },
-        checkTwoSet(isFullHouseMode) {
-            var hand = this.rankSet();
+        checkTwoSet(hand, isFullHouseMode) {
+            var handSet = this.rankSet(hand);
 
-            if (hand.size === 2) {
+            if (handSet.size === 2) {
                 var matchCount = 0;
 
                 for (var i = 1; i < 5; i++) {
-                    if ((this.deck[i][0] === this.deck[0][0])) {
+                    if ((hand[i][0] === hand[0][0])) {
                         matchCount++;
                     }
                 }
@@ -359,30 +359,30 @@ export default {
             else
                 return false;
         },
-        checkFourKind() {
-            return this.checkTwoSet(false);
+        checkFourKind(hand) {
+            return this.checkTwoSet(hand, false);
         },
-        checkFullHouse() {
-            return this.checkTwoSet(true);
+        checkFullHouse(hand) {
+            return this.checkTwoSet(hand, true);
         },
-        checkFlush() {
+        checkFlush(hand) {
             for (var i = 1; i < 5; i++) {
-                if (!(this.deck[i][1] === this.deck[0][1])) {
+                if (!(hand[i][1] === hand[0][1])) {
                     return false;
                 }
             }
             return true;
         },
-        checkStraight() {
-            var hand = this.rankSet();
+        checkStraight(hand) {
+            var handSet = this.rankSet(hand);
 
-            return hand.size === 5 && (Math.max(...hand) - Math.min(...hand) === 4);
+            return handSet.size === 5 && (Math.max(...handSet) - Math.min(...handSet) === 4);
         },
-        checkThreeKind() {
-            var hand = this.rankSet();
+        checkThreeKind(hand) {
+            var handSet = this.rankSet(hand);
 
-            if (hand.size <= 3) {
-                var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
+            if (handSet.size <= 3) {
+                var handArr = [hand[0][0], hand[1][0], hand[2][0], hand[3][0], hand[4][0]];
                 return handArr.filter((v, i, arr) => i !== arr.indexOf(v))
                     .filter((v, i, arr) => i !== arr.indexOf(v))
                     .length > 0;
@@ -390,11 +390,11 @@ export default {
             else
                 return false;
         },
-        checkTwoPair() {
-            var hand = this.rankSet();
+        checkTwoPair(hand) {
+            var handSet = this.rankSet(hand);
 
-            if (hand.size <= 3) {
-                var handArr = [this.deck[0][0], this.deck[1][0], this.deck[2][0], this.deck[3][0], this.deck[4][0]];
+            if (handSet.size <= 3) {
+                var handArr = [hand[0][0], hand[1][0], hand[2][0], hand[3][0], hand[4][0]];
                 var dupeArr = handArr.filter((v, i, arr) => i !== arr.indexOf(v));
 
                 return new Set(dupeArr).size == 2;
@@ -402,8 +402,8 @@ export default {
             else
                 return false;
         },
-        checkPair() {
-            return this.rankSet().size <= 4;
+        checkPair(hand) {
+            return this.rankSet(hand).size <= 4;
         },
         getBestHand() {
             var set = [...this.cards, ...this.pockets];
