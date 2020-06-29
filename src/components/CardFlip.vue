@@ -421,16 +421,12 @@ export default {
         {
             // Adapted from https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
             if (index == r)
-            {
                 outputSet.push(temp.slice());
-                return;
-            }
-
-            for (var i = start; i <= end && end - i + 1 >= r - index; i++)
-            {
-                temp[index] = set[i];
-                this.handComboUtil(set, outputSet, temp, i+1, end, index+1, r);
-            }
+            else
+                for (var i = start; i <= end && end - i + 1 >= r - index; i++) {
+                    temp[index] = set[i];
+                    this.handComboUtil(set, outputSet, temp, i+1, end, index+1, r);
+                }
         },
     },
 }
