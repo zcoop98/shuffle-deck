@@ -414,6 +414,18 @@ export default {
             }
             var combos = [];
             this.getAllHandCombos(set, combos);
+
+            var bestCombo = [null, 0];
+            var handScore = 0;
+            for (var j = combos.length - 1; j >= 0; --j) {
+                //test each combo
+                //keep highest scoring
+                handScore = this.scoreHand(combos[j]);
+                if (handScore > bestCombo[1]) {
+                    bestCombo[0] = combos[j];
+                    bestCombo[1] = handScore;
+                }
+            }
         },
         getAllHandCombos(set, outputSet) {
             var temp = [];
@@ -429,6 +441,37 @@ export default {
                     temp[index] = set[i];
                     this.handComboUtil(set, outputSet, temp, i+1, end, index+1, r);
                 }
+        },
+        scoreHand(hand) {
+            if (this.checkRoyalFlush(hand)) { // Royal is worth 9 pts; only one royal possible per draw so no tie break needed
+                return 9;
+            }
+            else if (this.checkStraightFlush(hand)) { // Striaght Flush is worth 8 pts; tie break: highest card
+                return 8;
+            }
+            else if (this.checkFourKind(hand)) { // Four of a Kind is worth 7 pts; tie break: highest kicker
+                return 7;
+            }
+            else if (this.checkFullHouse(hand)) { // Full House is worth 6 pts; tie break: highest triple, then highest double
+                return 6;
+            }
+            else if (this.checkFlush(hand)) { // Flush is worth 5 pts; tie break: highest cards, in descending order
+                return 5;
+            }
+            else if (this.checkStraight(hand)) { // Straight is worth 4 pts; tie break: highest card
+                return 4;
+            }
+            else if (this.checkThreeKind(hand)) { // Three of a Kind is worth 3 pts; tie break: highest triple, then highest kickers, in descending order
+                return 3;
+            }
+            else if (this.checkTwoPair(hand)) { // Two Pair is worth 2 pts; tie break: highest pairs, in descending order, then kicker
+                return 2;
+            }
+            else if (this.checkPair(hand)) { // Pair is worth 1 pts; tie break: highest pair, then highest kickers, in descending order
+                return 1;
+            }
+            else // High card is worth 0 pts; tie break: highest cards, in descending order
+                return 0;
         },
     },
 }
