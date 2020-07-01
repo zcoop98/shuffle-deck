@@ -224,7 +224,7 @@ export default {
     methods: {
         reDeal() {
             this.shuffleDeck();
-            for (var i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 this.cards[i].face = this.deck[i];
                 this.cards[i].hide = true;
             }
@@ -250,7 +250,7 @@ export default {
             this.cards[cardNum].hide = !this.cards[cardNum].hide;
         },
         flop() {
-            for (var i = 0; i < 3; i++) {
+            for (let i = 0; i < 3; i++) {
                 this.cards[i].hide = false;
             }
         },
@@ -322,7 +322,7 @@ export default {
 
                 this.isLoading = false;
 
-                for (var j = 0; j < 5; j++) {
+                for (let j = 0; j < 5; j++) {
                     this.cards[j].face = this.deck[j];
                     this.cards[j].hide = false;
                 }
@@ -334,7 +334,7 @@ export default {
                 return false;
 
             //rank check (flush found, checking royal)
-            for (var i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 //Can use a special method since a royal's ranks are all non-numbers
                 if (!isNaN(+hand[i][0])) {
                     return false;
@@ -351,7 +351,7 @@ export default {
             if (handSet.size === 2) {
                 var matchCount = 0;
 
-                for (var i = 1; i < 5; i++) {
+                for (let i = 1; i < 5; i++) {
                     if ((hand[i][0] === hand[0][0])) {
                         matchCount++;
                     }
@@ -368,7 +368,7 @@ export default {
             return this.checkTwoSet(hand, true);
         },
         checkFlush(hand) {
-            for (var i = 1; i < 5; i++) {
+            for (let i = 1; i < 5; i++) {
                 if (!(hand[i][1] === hand[0][1])) {
                     return false;
                 }
@@ -409,7 +409,7 @@ export default {
         },
         getBestHand() {
             var set = [...this.cards, ...this.pockets];
-            for (var i = 0; i < set.length; ++i) {
+            for (let i = 0; i < set.length; ++i) {
                 set[i] = set[i].face;
             }
             var combos = [];
@@ -417,7 +417,7 @@ export default {
 
             var bestCombo = [null, 0];
             var handScore = 0;
-            for (var j = combos.length - 1; j >= 0; --j) {
+            for (let j = combos.length - 1; j >= 0; --j) {
                 //test each combo
                 //keep highest scoring
                 handScore = this.scoreHand(combos[j]);
@@ -437,7 +437,7 @@ export default {
             if (index == r)
                 outputSet.push(temp.slice());
             else
-                for (var i = start; i <= end && end - i + 1 >= r - index; i++) {
+                for (let i = start; i <= end && end - i + 1 >= r - index; i++) {
                     temp[index] = set[i];
                     this.handComboUtil(set, outputSet, temp, i+1, end, index+1, r);
                 }
