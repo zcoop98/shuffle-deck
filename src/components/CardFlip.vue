@@ -496,7 +496,7 @@ export default {
             }
 
             else if (this.checkFullHouse(hand)) { // Full House - 6 pts; tie break: highest triple, then highest double
-                let score = 6;
+                let score = '6.';
                 let totals = {};
                 let triple = 0;
                 let pair = 0;
