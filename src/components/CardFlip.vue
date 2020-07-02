@@ -124,6 +124,10 @@
                     <b-row class="mt-4" align-h="center">
                         <b-col cols="4">
                             <b-card>
+                                <h5 class="text-left">
+                                    Pocket cards:
+                                </h5>
+
                                 <vue-playing-card
                                     v-for="pocket in pockets"
                                     :key="pocket.face"
@@ -134,11 +138,21 @@
                                 />
                             </b-card>
                         </b-col>
-                        <b-col cols="2">
-                            <b-btn @click="getBestHand">
-                                Check Best Hand
-                            </b-btn>
-                            {{ JSON.stringify(bestHand) }}
+
+                        <b-col cols="4">
+                            <div v-if="riverDone">
+                                <h5 class="text-left">
+                                    {{ bestHandName }}
+                                </h5>
+
+                                <vue-playing-card
+                                    v-for="card in bestHand"
+                                    :key="card"
+                                    class="px-1"
+                                    :signature="card"
+                                    height="140"
+                                />
+                            </div>
                         </b-col>
                     </b-row>
                 </b-tab>
@@ -192,29 +206,8 @@ export default {
                     hide: false,
                 }
             ],
-            // bestHand: [
-            //     {
-            //         face: null,
-            //         hide: true,
-            //     },
-            //     {
-            //         face: null,
-            //         hide: true,
-            //     },
-            //     {
-            //         face: null,
-            //         hide: true,
-            //     },
-            //     {
-            //         face: null,
-            //         hide: true,
-            //     },
-            //     {
-            //         face: null,
-            //         hide: true,
-            //     }
-            // ],
-            bestHand: '',
+            bestHand: [],
+            bestHandScore: 0,
             genShuffles: '-',
             msTimeElapsed: '-',
             isLoading: false,
@@ -232,6 +225,37 @@ export default {
         },
         riverDone() {
             return !this.cards[4].hide || this.isLoading;
+        },
+        bestHandName() {
+            switch (Math.floor(this.bestHandScore)) {
+                case 0:
+                    return 'High Card';
+                case 1:
+                    return 'Pair';
+                case 2:
+                    return 'Two Pair';
+                case 3:
+                    return 'Three of a Kind';
+                case 4:
+                    return 'Straight';
+                case 5:
+                    return 'Flush';
+                case 6:
+                    return 'Full House';
+                case 7:
+                    return 'Four of a Kind';
+                case 8:
+                    return 'Straight Flush';
+                case 9:
+                    return 'Royal Flush';
+                default:
+                    return 'Error';
+            }
+        },
+    },
+    watch: {
+        riverDone(newVal) {
+            if (newVal) this.getBestHand();
         },
     },
     created() { //initialize deck
@@ -441,16 +465,25 @@ export default {
             var combos = [];
             this.getAllHandCombos(set, combos);
 
-            var bestCombo = [null, 0];
+            var bestCombo = null;
+            var bestComboScore = 0;
             var handScore = 0;
             for (let j = combos.length - 1; j >= 0; --j) { //test each combo, keep highest scoring
                 handScore = this.scoreHand(combos[j]);
-                if (handScore > bestCombo[1]) {
-                    bestCombo[0] = combos[j];
-                    bestCombo[1] = handScore;
+                if (handScore > bestComboScore) {
+                    bestCombo = combos[j];
+                    bestComboScore = handScore;
                 }
             }
-            this.bestHand = bestCombo;
+
+            this.bestHand = bestCombo.sort(
+                (a, b) => {
+                    a = +this.removeSuit(this.rankToNumber(a));
+                    b = +this.removeSuit(this.rankToNumber(b));
+                    return (a > b) ? 1 : (a < b) ? -1 : 0;
+                }
+            );
+            this.bestHandScore = bestComboScore;
         },
         getAllHandCombos(set, outputSet) {
             var temp = [];
