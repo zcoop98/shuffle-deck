@@ -263,11 +263,11 @@ export default {
         },
         rankSet(hand) {
             return new Set([
-                this.rankToNumber(hand[0]),
-                this.rankToNumber(hand[1]),
-                this.rankToNumber(hand[2]),
-                this.rankToNumber(hand[3]),
-                this.rankToNumber(hand[4])
+                this.removeSuit(this.rankToNumber(hand[0])),
+                this.removeSuit(this.rankToNumber(hand[1])),
+                this.removeSuit(this.rankToNumber(hand[2])),
+                this.removeSuit(this.rankToNumber(hand[3])),
+                this.removeSuit(this.rankToNumber(hand[4]))
             ]);
         },
         flip(cardNum) {
@@ -287,23 +287,25 @@ export default {
             this.cards[4].hide = false;
         },
         rankToNumber(signature) {
-            var rank = signature[0];
+            const suit = signature[signature.length - 1];
 
-            if (isNaN(rank))
-                switch (rank) {
-                    case 'T':
-                        return '10';
-                    case 'J':
-                        return '11';
-                    case 'Q':
-                        return '12';
-                    case 'K':
-                        return '13';
-                    case 'A':
-                        return '14';
-                }
-            else
-                return rank;
+            switch (signature[0]) {
+                case 'T':
+                    return '10' + suit;
+                case 'J':
+                    return '11' + suit;
+                case 'Q':
+                    return '12' + suit;
+                case 'K':
+                    return '13' + suit;
+                case 'A':
+                    return '14' + suit;
+                default:
+                    return signature;
+            }
+        },
+        removeSuit(signature) {
+            return signature.slice(0, signature.length - 1);
         },
         generateHand(handId) {
             const hands = [
