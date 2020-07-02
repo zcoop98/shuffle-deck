@@ -450,7 +450,7 @@ export default {
                     bestCombo[1] = handScore;
                 }
             }
-            this.bestHand = bestCombo[0];
+            this.bestHand = bestCombo;
         },
         getAllHandCombos(set, outputSet) {
             var temp = [];
@@ -468,25 +468,23 @@ export default {
                 }
         },
         scoreHand(hand) {
-            var ranksOnlyHand = hand.map(card => this.rankToNumber(card).slice(0, card.length - 1)); // Create array of numerical signatures without suits from hand
+            var ranksOnlyHand = hand.map(card => +this.removeSuit(this.rankToNumber(card))); // Create array of numerical signatures without suits from hand
             var maxCard = Math.max(...ranksOnlyHand);
 
-            if (this.checkRoyalFlush(hand)) { // Royal is worth 9 pts; only one royal possible per draw so no tie break needed
+            if (this.checkRoyalFlush(hand)) { // Royal - 9 pts; only one royal possible per draw so no tie break needed
                 return 9;
             }
 
-            else if (this.checkStraightFlush(hand)) { // Striaght Flush is worth 8 pts; tie break: highest card
-                /// Strategy: find highest card, add to score in hundredths place; if ace is selected, check whether it's high or low straight
+            else if (this.checkStraightFlush(hand)) { // Striaght Flush - 8 pts; tie break: highest card
                 let score = 8;
 
-                if (maxCard == 14 && ranksOnlyHand.some(card => card == 2)) /// 2 and A in straight indicates low straight
+                if (maxCard == 14 && ranksOnlyHand.some(card => card == 2)) // 2 and A in straight indicates low straight
                     maxCard = 5;
 
                 return score + maxCard * 0.01;
             }
 
-            else if (this.checkFourKind(hand)) { // Four of a Kind is worth 7 pts; tie break: highest kicker
-                /// Strategy: find kicker, add to score in hudredths place
+            else if (this.checkFourKind(hand)) { // Four of a Kind - 7 pts; tie break: highest kicker
                 if (ranksOnlyHand[0] != ranksOnlyHand[1])
                     if (ranksOnlyHand[0] == ranksOnlyHand[2])
                         return 7 + ranksOnlyHand[1] * 0.01;
@@ -497,23 +495,22 @@ export default {
                 }
             }
 
-            else if (this.checkFullHouse(hand)) { // Full House is worth 6 pts; tie break: highest triple, then highest double
-                /// Strategy: find triplet rank, add to score in hundredths place, then add pair rank to ten thousands place
+            else if (this.checkFullHouse(hand)) { // Full House - 6 pts; tie break: highest triple, then highest double
                 let score = 6;
                 let totals = {};
                 let triple = 0;
                 let pair = 0;
 
-                for (let card of ranksOnlyHand) { /// Count quantity of each rank
+                for (let card of ranksOnlyHand) { // Count quantity of each rank
                     if (!totals[card])
                         totals[card] = 0;
                     totals[card]++;
                 }
 
                 for (let card in totals) {
-                    if (totals[card] == 3) /// Triplet
+                    if (totals[card] == 3)
                         triple = card;
-                    else /// Pair
+                    else
                         pair = card;
                 }
 
@@ -523,34 +520,31 @@ export default {
                 return parseFloat(score);
             }
 
-            else if (this.checkFlush(hand)) { // Flush is worth 5 pts; tie break: highest cards, in descending order
-                /// Strategy: Sort ranks, add each to score in increasingly smaller decimal places
-                ranksOnlyHand.sort((a, b) => (a < b) ? 1 : (a > b) ? -1 : 0); /// Sort into descending order
-                let score = '5.'; /// Use string concat instead of decimal addition to avoid precision issues
+            else if (this.checkFlush(hand)) { // Flush - 5 pts; tie break: highest cards, in descending order
+                ranksOnlyHand.sort((a, b) => (a < b) ? 1 : (a > b) ? -1 : 0); // Sort into descending order
+                let score = '5.'; // Use string concat instead of decimal addition to avoid precision issues
 
                 for (let i = 0; i < 5; i++)
                     score += ranksOnlyHand[i].toString().padStart(2, '0');
 
-                return parseFloat(score); /// Return as decimal
+                return parseFloat(score); // Return as decimal
             }
 
-            else if (this.checkStraight(hand)) { // Straight is worth 4 pts; tie break: highest card
-                /// Strategy: find highest card, add to score in hundredths place; if ace is selected, check whether it's high or low straight
+            else if (this.checkStraight(hand)) { // Straight - 4 pts; tie break: highest card
                 let score = 4;
 
-                if (maxCard == 14 && ranksOnlyHand.some(card => card == 2)) /// 2 and A in straight indicates low straight
+                if (maxCard == 14 && ranksOnlyHand.some(card => card == 2)) // 2 and A in straight indicates low straight
                     maxCard = 5;
 
                 return score + maxCard * 0.01;
             }
 
-            else if (this.checkThreeKind(hand)) { // Three of a Kind is worth 3 pts; tie break: highest triple, then highest kickers, in descending order
-                /// Strategy: Find triplet, then sort kickers and add to score in order
+            else if (this.checkThreeKind(hand)) { // Three of a Kind - 3 pts; tie break: highest triple, then highest kickers in descending order
                 let score = '3.';
                 let totals = {};
                 let kickers = [];
 
-                for (let card of ranksOnlyHand) { /// Count quantity of each rank
+                for (let card of ranksOnlyHand) { // Count quantity of each rank
                     if (!totals[card])
                         totals[card] = 0;
                     totals[card]++;
@@ -558,25 +552,24 @@ export default {
 
                 for (let card in totals) {
                     if (totals[card] == 3)
-                        score += card.toString().padStart(2, '0'); /// Add triplet score
+                        score += card.toString().padStart(2, '0'); // Add triplet score
                     else
                         kickers.push(card);
                 }
 
-                score += Math.max(...kickers).toString().padStart(2, '0'); /// Append kickers to score in order
+                score += Math.max(...kickers).toString().padStart(2, '0'); // Append kickers to score in order
                 score += Math.min(...kickers).toString().padStart(2, '0');
 
                 return parseFloat(score);
             }
 
-            else if (this.checkTwoPair(hand)) { // Two Pair is worth 2 pts; tie break: highest pairs, in descending order, then kicker
-                /// Strategy: Find high pairs in order and kicker
+            else if (this.checkTwoPair(hand)) { // Two Pair - 2 pts; tie break: highest pairs in descending order, then kicker
                 let score = '2.';
                 let totals = {};
                 let pairs = [];
                 let kicker = 0;
 
-                for (let card of ranksOnlyHand) { /// Count quantity of each rank
+                for (let card of ranksOnlyHand) { // Count quantity of each rank
                     if (!totals[card])
                         totals[card] = 0;
                     totals[card]++;
@@ -596,14 +589,13 @@ export default {
                 return parseFloat(score);
             }
 
-            else if (this.checkPair(hand)) { // Pair is worth 1 pts; tie break: highest pair, then highest kickers, in descending order
-                /// Strategy: Find pair, then sort kickers, append in decreasing order after pair
+            else if (this.checkPair(hand)) { // Pair - 1 pts; tie break: highest pair, then highest kickers in descending order
                 let score = '1.';
                 let totals = {};
                 let kickers = [];
                 let pair = 0;
 
-                for (let card of ranksOnlyHand) { /// Count quantity of each rank
+                for (let card of ranksOnlyHand) { // Count quantity of each rank
                     if (!totals[card])
                         totals[card] = 0;
                     totals[card]++;
@@ -616,21 +608,20 @@ export default {
                         kickers.push(card);
                 }
 
-                kickers.sort((a, b) => (+a < +b) ? 1 : (+a > +b) ? -1 : 0);
+                kickers.sort((a, b) => (a < b) ? 1 : (a > b) ? -1 : 0);
 
                 score += pair.toString().padStart(2, '0');
                 for (let card of kickers)
                     score += card.toString().padStart(2, '0');
-                
+
                 return parseFloat(score);
             }
 
-            else { // High card is worth 0 pts; tie break: highest cards, in descending order
-                /// Strategy: Sort the hand by rank, append each to score in increasingly smaller order
+            else { // High card - 0 pts; tie break: highest cards in descending order
                 let score = '0.';
                 ranksOnlyHand.sort((a, b) => (a < b) ? 1 : (a > b) ? -1 : 0);
 
-                for (let card in ranksOnlyHand)
+                for (let card of ranksOnlyHand)
                     score += card.toString().padStart(2, '0');
 
                 return parseFloat(score);
