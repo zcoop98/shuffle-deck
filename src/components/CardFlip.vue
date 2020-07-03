@@ -229,24 +229,37 @@ export default {
         bestHandName() {
             switch (Math.floor(this.bestHandScore)) {
                 case 0:
-                    return 'High Card';
+                    return 'High Card, ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4));
                 case 1:
-                    return 'Pair';
+                    // #.ppk3k2k1
+                    return 'Pair of ' + this.numberToRank(Math.floor((this.bestHandScore - 1) * 100)) + "'s";
                 case 2:
-                    return 'Two Pair';
+                    // #.p1p2kk
+                    return 'Two Pair, ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4)) +
+                        "'s & " + this.numberToRank(this.bestHandScore.toString().substring(4, 6)) + "'s, " +
+                        this.numberToRank(this.bestHandScore.toString().substring(6, 8)) + ' kicker';
                 case 3:
-                    return 'Three of a Kind';
+                    // #.ttk2k1
+                    return '3 of a Kind, ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4)) + "'s";
                 case 4:
-                    return 'Straight';
+                    // #.k5k4k3k2k1
+                    return 'Straight, ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4)) + ' High';
                 case 5:
+                    // #.k5k4k3k2k1
                     return 'Flush';
                 case 6:
-                    return 'Full House';
+                    // #.ttpp
+                    return 'Full House ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4)) +
+                        "'s On " + this.numberToRank(this.bestHandScore.toString().substring(4, 6));
                 case 7:
-                    return 'Four of a Kind';
+                    // #.qqkk
+                    return '4 of a Kind, ' + this.numberToRank(this.bestHandScore.toString().substring(2, 4)) + "'s" +
+                        this.numberToRank(this.bestHandScore.toString().substring(6, 8)) + ' kicker';
                 case 8:
+                    // #.k5k4k3k2k1
                     return 'Straight Flush';
                 case 9:
+                    // 9
                     return 'Royal Flush';
                 default:
                     return 'Error';
@@ -259,7 +272,7 @@ export default {
         },
     },
     created() { //initialize deck
-        const rank = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'T', 'J', 'Q', 'K'];
+        const rank = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
         const suit = ['S', 'D', 'C', 'H'];
 
         for (let i = 0; i < 4; i++)
@@ -326,6 +339,22 @@ export default {
                     return '14' + suit;
                 default:
                     return signature;
+            }
+        },
+        numberToRank(rank) {
+            switch (rank.toString()) {
+                case '10':
+                    return 'T';
+                case '11':
+                    return 'J';
+                case '12':
+                    return 'Q';
+                case '13':
+                    return 'K';
+                case '14':
+                    return 'A';
+                default:
+                    return (+rank).toString();
             }
         },
         removeSuit(signature) {
