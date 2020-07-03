@@ -428,7 +428,18 @@ export default {
         checkStraight(hand) {
             var handSet = this.rankSet(hand);
 
-            return handSet.size === 5 && (Math.max(...handSet) - Math.min(...handSet) === 4);
+            if (handSet.size === 5)
+                if (handSet.has('14')) {
+                    var aceLowSet = this.rankSet(hand);
+                    aceLowSet.delete('14');
+                    aceLowSet.add('1');
+
+                    return (Math.max(...handSet) - Math.min(...handSet) === 4) || (Math.max(...aceLowSet) - Math.min(...aceLowSet) === 4);
+                }
+                else
+                    return (Math.max(...handSet) - Math.min(...handSet) === 4);
+            else
+                return false;
         },
         checkThreeKind(hand) {
             var handSet = this.rankSet(hand);
@@ -475,14 +486,19 @@ export default {
                     bestComboScore = handScore;
                 }
             }
-
-            this.bestHand = bestCombo.sort(
+            bestCombo.sort(
                 (a, b) => {
                     a = +this.removeSuit(this.rankToNumber(a));
                     b = +this.removeSuit(this.rankToNumber(b));
                     return (a > b) ? 1 : (a < b) ? -1 : 0;
                 }
             );
+
+            if (bestComboScore.toString().substring(0, 4) == '4.05' || bestComboScore.toString().substring(0, 4) == '8.05') // check for 5-high straight
+                bestCombo = [bestCombo.pop(), ...bestCombo];
+                
+
+            this.bestHand = bestCombo;
             this.bestHandScore = bestComboScore;
         },
         getAllHandCombos(set, outputSet) {
